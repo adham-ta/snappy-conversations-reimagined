@@ -64,9 +64,9 @@ export default {
 					ring: 'hsl(var(--sidebar-ring))'
 				},
 				chat: {
-					primary: '#6B7AF7',
-					secondary: '#f4f4f8',
-					light: '#f8f9fa'
+					primary: 'hsl(var(--chat-primary))',
+					secondary: 'hsl(var(--chat-secondary))',
+					light: 'hsl(var(--chat-light))'
 				}
 			},
 			borderRadius: {

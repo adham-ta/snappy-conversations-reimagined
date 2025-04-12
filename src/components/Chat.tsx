@@ -95,9 +95,10 @@ const Chat: React.FC = () => {
     const newConversation = {
       id: chatId,
       contact: {
+        id: uuidv4(), // Adding id to fix the type error
         name: "New Contact",
         avatar: "",
-        status: "online"
+        status: "online" as const // Adding type assertion
       },
       lastMessage: {
         content: "Start a conversation",
@@ -147,8 +148,8 @@ const Chat: React.FC = () => {
             onMenuToggle={handleToggleSidebar}
           />
         ) : (
-          <div className="flex items-center justify-center h-full bg-white">
-            <p className="text-gray-500">Select a conversation to start chatting</p>
+          <div className="flex items-center justify-center h-full bg-white dark:bg-gray-800">
+            <p className="text-gray-500 dark:text-gray-400">Select a conversation to start chatting</p>
           </div>
         )}
       </div>
