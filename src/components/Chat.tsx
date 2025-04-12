@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import ConversationList from './ConversationList';
 import ChatRoom from './ChatRoom';
@@ -19,7 +19,7 @@ const Chat: React.FC = () => {
   const isMobile = useIsMobile();
   
   // Auto-hide sidebar on mobile
-  React.useEffect(() => {
+  useEffect(() => {
     if (isMobile) {
       setShowSidebar(false);
     } else {
@@ -88,6 +88,33 @@ const Chat: React.FC = () => {
       )
     );
   };
+
+  const handleChatCreated = (chatId: string) => {
+    // In a real app, you would fetch the chat details from the database
+    // For now, we'll just add a mock conversation
+    const newConversation = {
+      id: chatId,
+      contact: {
+        name: "New Contact",
+        avatar: "",
+        status: "online"
+      },
+      lastMessage: {
+        content: "Start a conversation",
+        timestamp: new Date(),
+        isRead: true,
+        isFromCurrentUser: false
+      },
+      unreadCount: 0
+    };
+    
+    setConversations(prev => [...prev, newConversation]);
+    setActiveConversationId(chatId);
+    setMessages(prev => ({
+      ...prev,
+      [chatId]: []
+    }));
+  };
   
   const activeConversation = conversations.find(c => c.id === activeConversationId);
   const activeMessages = messages[activeConversationId] || [];
@@ -104,6 +131,7 @@ const Chat: React.FC = () => {
           conversations={conversations}
           activeConversationId={activeConversationId}
           onSelectConversation={handleSelectConversation}
+          onChatCreated={handleChatCreated}
         />
       </div>
       
