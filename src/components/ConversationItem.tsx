@@ -32,23 +32,25 @@ const ConversationItem: React.FC<ConversationProps> = ({
     <div 
       className={cn(
         "flex items-center p-3 cursor-pointer transition-colors",
-        isActive ? "bg-chat-light" : "hover:bg-gray-50"
+        isActive 
+          ? "bg-chat-light dark:bg-gray-700" 
+          : "hover:bg-gray-50 dark:hover:bg-gray-700/50"
       )}
     >
       <div className="relative">
         <Avatar src={contact.avatar} alt={contact.name} />
         {contact.status === 'online' && (
-          <span className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-white rounded-full"></span>
+          <span className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-white dark:border-gray-800 rounded-full"></span>
         )}
         {contact.status === 'away' && (
-          <span className="absolute bottom-0 right-0 w-3 h-3 bg-yellow-500 border-2 border-white rounded-full"></span>
+          <span className="absolute bottom-0 right-0 w-3 h-3 bg-yellow-500 border-2 border-white dark:border-gray-800 rounded-full"></span>
         )}
       </div>
       
       <div className="ml-3 flex-1 min-w-0">
         <div className="flex justify-between items-baseline">
-          <h3 className="font-medium text-sm truncate">{contact.name}</h3>
-          <span className="text-xs text-gray-500 whitespace-nowrap ml-2">
+          <h3 className="font-medium text-sm truncate dark:text-white">{contact.name}</h3>
+          <span className="text-xs text-gray-500 dark:text-gray-400 whitespace-nowrap ml-2">
             {format(lastMessage.timestamp, 'h:mm a')}
           </span>
         </div>
@@ -56,7 +58,9 @@ const ConversationItem: React.FC<ConversationProps> = ({
         <div className="flex justify-between items-center mt-1">
           <p className={cn(
             "text-xs truncate", 
-            unreadCount > 0 && !lastMessage.isFromCurrentUser ? "font-semibold" : "text-gray-500"
+            unreadCount > 0 && !lastMessage.isFromCurrentUser 
+              ? "font-semibold dark:text-white" 
+              : "text-gray-500 dark:text-gray-400"
           )}>
             {lastMessage.isFromCurrentUser ? "You: " : ""}{lastMessage.content}
           </p>
