@@ -143,7 +143,7 @@ const Chat: React.FC = () => {
     return () => {
       supabase.removeChannel(participantsChannel);
     };
-  }, [user, toast]);
+  }, [user, toast, activeConversationId]);
   
   // Fetch messages when active conversation changes
   useEffect(() => {
@@ -151,26 +151,54 @@ const Chat: React.FC = () => {
     
     const fetchMessages = async () => {
       try {
+        // Modified query to properly fetch sender information
         const { data, error } = await supabase
           .from('messages')
-          .select('*, sender:sender_id(id, username, display_name, avatar_url)')
+          .select(`
+            id, 
+            content, 
+            created_at, 
+            sender_id
+          `)
           .eq('chat_id', activeConversationId)
           .order('created_at', { ascending: true });
           
         if (error) throw error;
         
         if (data) {
-          const formattedMessages = data.map(msg => ({
-            id: msg.id,
-            content: msg.content,
-            timestamp: new Date(msg.created_at),
-            sender: {
-              id: msg.sender.id,
-              name: msg.sender.display_name || msg.sender.username,
-              avatar: msg.sender.avatar_url || ''
-            },
-            isCurrentUser: msg.sender.id === user.id
-          }));
+          // Get all unique sender IDs
+          const senderIds = [...new Set(data.map(msg => msg.sender_id))];
+          
+          // Fetch all sender profiles in one go
+          const { data: senderProfiles, error: senderError } = await supabase
+            .from('profiles')
+            .select('id, username, display_name, avatar_url')
+            .in('id', senderIds);
+            
+          if (senderError) throw senderError;
+          
+          // Create lookup map for sender profiles
+          const senderMap = senderProfiles ? 
+            senderProfiles.reduce((acc, profile) => ({
+              ...acc,
+              [profile.id]: profile
+            }), {}) : {};
+          
+          const formattedMessages = data.map(msg => {
+            const senderProfile = senderMap[msg.sender_id] || {};
+            
+            return {
+              id: msg.id,
+              content: msg.content,
+              timestamp: new Date(msg.created_at),
+              sender: {
+                id: msg.sender_id,
+                name: senderProfile.display_name || senderProfile.username || 'Unknown',
+                avatar: senderProfile.avatar_url || ''
+              },
+              isCurrentUser: msg.sender_id === user.id
+            };
+          });
           
           setMessages(prev => ({
             ...prev,
